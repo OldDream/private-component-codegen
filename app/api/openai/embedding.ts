@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { env } from '@/lib/env.mjs';
+import { SearchResult, searchSimilarContent } from '@/lib/db/openai/selectors';
 
 interface EmbeddingResult {
   text: string;
@@ -44,4 +45,25 @@ export async function generateEmbeddings(
     console.error('Error generating embeddings:', error);
     throw error;
   }
+}
+
+// 生成单个embedding
+export async function generateSingleEmbedding(text: string): Promise<number[]> {
+  const embedding = await embeddingAI.embeddings.create({
+    model: env.EMBEDDING,
+    input: text,
+    encoding_format: 'float'
+  });
+  return embedding.data[0].embedding;
+}
+
+// 检索召回
+export async function retrieveEmbedding(
+  text: string,
+  threshold: number = 0.7,
+  limit: number = 5
+): Promise<SearchResult[]> {
+  const embedding = await generateSingleEmbedding(text);
+  const results = await searchSimilarContent(embedding, threshold, limit);
+  return results;
 }
