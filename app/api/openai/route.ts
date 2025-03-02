@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const lastMessageContent = lastMessage.content as string;
 
     // Search for relevant content using embeddings
-    const relevantContent = await retrieveEmbedding(lastMessageContent, 0.7, 3);
+    const relevantContent = await retrieveEmbedding(lastMessageContent, 0.5, 3);
     const reference = relevantContent.map((result) => result.content).join('\n\n');
 
     // Create system prompt with reference content

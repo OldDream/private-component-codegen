@@ -31,15 +31,15 @@ export async function searchSimilarContent(
   const results = await db
     .select({
       content: openAiEmbeddings.content,
-      similarity: sql<number>`1 - (${sql.raw(openAiEmbeddings.embedding.name)} <=> array[${sql.raw(
-        embedding.join(',')
-      )}]::float4[])::float`.as('similarity')
+      similarity: sql<number>`1 - (${sql.raw(openAiEmbeddings.embedding.name)} <=> ${sql.raw(
+        `'[${embedding.join(',')}]'::vector(1536)`
+      )})::float`.as('similarity')
     })
     .from(openAiEmbeddings)
     .where(
-      sql`1 - (${sql.raw(openAiEmbeddings.embedding.name)} <=> array[${sql.raw(
-        embedding.join(',')
-      )}]::float4[])::float >= ${threshold}`
+      sql`1 - (${sql.raw(openAiEmbeddings.embedding.name)} <=> ${sql.raw(
+        `'[${embedding.join(',')}]'::vector(1536)`
+      )})::float >= ${threshold}`
     )
     .orderBy(sql`similarity DESC`)
     .limit(limit);
