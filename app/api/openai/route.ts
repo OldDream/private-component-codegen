@@ -43,6 +43,7 @@ export async function POST(req: NextRequest): Promise<Response> {
             similarDocs = await retrieveSimilarEmbeddings(lastUserMessage.content);
             // Send the related content to the client
             if (similarDocs.length > 0) {
+              console.log('similarDocs--- > sse');
               sendEvent('similar', JSON.stringify(similarDocs));
             }
           } catch (error) {
