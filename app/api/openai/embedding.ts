@@ -2,10 +2,11 @@
  * @Author: huangyuning huangyuning@vv.cn
  * @Date: 2025-04-16 16:09:24
  * @LastEditors: huangyuning huangyuning@vv.cn
- * @LastEditTime: 2025-04-16 18:30:37
+ * @LastEditTime: 2025-04-17 11:45:52
  * @FilePath: /private-component-codegen/app/api/openai/embedding.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
+import { searchSimilarEmbeddings } from '@/lib/db/openai/selectors';
 import { env } from '@/lib/env.mjs';
 import OpenAI from 'openai';
 
@@ -56,3 +57,22 @@ export async function generateEmbeddings(
     throw error;
   }
 }
+
+// 生成单个embedding
+export async function generateSingleEmbedding(text: string) {
+  const response = await openai.embeddings.create({
+    model: env.EMBEDDING,
+    input: text,
+    encoding_format: 'float',
+  });
+  return response.data[0].embedding;
+}
+
+// 利用用户输入，retrieval 相似的embedding
+export async function retrieveSimilarEmbeddings(text: string, threshold: number = 0.7, limit: number = 5) {
+  const embedding = await generateSingleEmbedding(text);
+  const results = await searchSimilarEmbeddings(embedding, threshold, limit);
+  console.log('retrieveSimilarEmbeddings', results)
+  return results;
+}
+
