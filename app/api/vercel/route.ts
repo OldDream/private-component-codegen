@@ -1,9 +1,11 @@
-import { streamText } from 'ai';
+import { streamText, createDataStreamResponse } from 'ai';
 import { env } from '@/lib/env.mjs';
 import { getSystemPrompt } from '@/lib/prompt';
 import { retrieveEmbedding } from './embedding';
 import { OpenAIRequest } from './types';
 import { openai } from './embedding';
+import { nanoid } from 'nanoid';
+
 // Create OpenAI client using Vercel AI SDK
 
 
@@ -22,19 +24,33 @@ export async function POST(request: Request) {
     // Create system prompt with reference content
     const systemPrompt = getSystemPrompt(reference);
 
-    // Using Vercel AI SDK's streamText for streaming response
-    const result = streamText({
-      model: openai(env.MODEL),
-      system: systemPrompt,
-      messages: message,
-      temperature: 0.7
-    });
+    // Use createDataStreamResponse to handle streaming with metadata
+    return createDataStreamResponse({
+      execute: async (dataStream) => {
+        // Stream the text response
+        const result = streamText({
+          model: openai(env.MODEL),
+          system: systemPrompt,
+          messages: message,
+          temperature: 0.7
+        });
 
-    // Return a standard text stream response
-    // The client will need to handle the references separately
-    // This is because StreamData type constraints make it difficult
-    // to add custom properties
-    return result.toDataStreamResponse();
+        // Transform SearchResult to RAGDocument format
+        const ragDocs = relevantContent.map(result => ({
+          id: nanoid(),
+          content: result.content,
+          score: result.similarity
+        }));
+
+        // Add the relevantContent as message annotation
+        dataStream.writeMessageAnnotation({
+          ragDocs
+        });
+
+        // Merge the text stream into the data stream
+        result.mergeIntoDataStream(dataStream);
+      }
+    });
   } catch (error) {
     console.error('Error in chat API:', error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
