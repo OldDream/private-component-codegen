@@ -2,19 +2,19 @@ import { streamText, createDataStreamResponse } from 'ai';
 import { env } from '@/lib/env.mjs';
 import { getSystemPrompt } from '@/lib/prompt';
 import { retrieveEmbedding } from './embedding';
-import { OpenAIRequest } from './types';
 import { openai } from './embedding';
 import { nanoid } from 'nanoid';
+import { Message } from 'ai';
 
 // Create OpenAI client using Vercel AI SDK
 
 
 export async function POST(request: Request) {
   try {
-    const { message } = await request.json() as OpenAIRequest;
+    const { messages } = await request.json() as { messages: Message[] };
 
     // Get the last message content for similarity search
-    const lastMessage = message[message.length - 1];
+    const lastMessage = messages[messages.length - 1];
     const lastMessageContent = lastMessage.content as string;
 
     // Search for relevant content using embeddings
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
         const result = streamText({
           model: openai(env.MODEL),
           system: systemPrompt,
-          messages: message,
+          messages,
           temperature: 0.7
         });
 

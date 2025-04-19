@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.5",
+    "@ai-sdk/react": "^1.2.9",
     "@ant-design/icons": "^5.5.1",
     "@ant-design/nextjs-registry": "^1.0.1",
     "@ant-design/use-emotion-css": "1.0.4",
