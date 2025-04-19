@@ -12,7 +12,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx lib/db/migrate.ts",
     "db:push": "drizzle-kit push",
-    "openai:embedding": "tsx app/api/openai/embedDocs.ts"
+    "openai:embedding": "tsx app/api/openai/embedDocs.ts",
+    "vercel:embedding": "tsx app/api/vercel/embedDocs.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.5",
