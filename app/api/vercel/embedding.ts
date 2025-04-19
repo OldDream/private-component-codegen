@@ -2,7 +2,7 @@
  * @Author: huangyuning huangyuning@vv.cn
  * @Date: 2025-04-19 16:30:18
  * @LastEditors: huangyuning huangyuning@vv.cn
- * @LastEditTime: 2025-04-19 17:23:41
+ * @LastEditTime: 2025-04-19 18:25:33
  * @FilePath: /private-component-codegen/app/api/vercel/embedding.ts
  * @Description: Vercel AI SDK based embedding implementation
  */
@@ -15,7 +15,7 @@ interface EmbeddingResult {
   text: string;
   embedding: number[];
 }
-const openai = createOpenAI({
+export const openai = createOpenAI({
   apiKey: env.AI_KEY,
   baseURL: env.AI_BASE_URL,
 });
